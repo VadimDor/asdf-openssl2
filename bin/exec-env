@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Workaround so Openssl2 knows where to find Homebrew-installed dynamic libraries
+# on M1 Macs. On M1, Homebrew lives in /opt/homebrew instead of /usr/local.
+# So end users have to put something like DYLD_LIBRARY_PATH=/opt/homebrew/lib
+# in their shell init files. However, macOS has a security feature called SIP
+# which prevents certain env vars such as DYLD_LIBRARY_PATH from propagating
+# to /usr/bin/env child processes. So, we assume that if the user is on M1 macOS
+# and has Homebrew installed, they want to link to libraries there. To skip this
+# set ASDF_OPENSSL2_MACOS_M1_HOMEBREW_WORKAROUND=no in your environment.
+if [ "${ASDF_OPENSSL2_MACOS_M1_HOMEBREW_WORKAROUND:-yes}" = "yes" ] &&
+	[ "$(uname)" = "Darwin" ] &&
+	[ "$(uname -m)" = "arm64" ] &&
+	[ "${DYLD_LIBRARY_PATH-}" = "" ] &&
+	[ -d /opt/homebrew/lib ]; then
+	export DYLD_LIBRARY_PATH
+	DYLD_LIBRARY_PATH=/opt/homebrew/lib
+fi
+
+# Override PATH so this asdf-openssl2 is found first
+export PATH
+PATH="${ASDF_INSTALL_PATH}/bin:${PATH}"
+
+export ASDF_OPENSSL2_DIR
+
+# Tell Openssl2 where to find asdf-openssl2 package metadata and packages.
+# If a user has a custom ASDF_OPENSSL2_DIR, use that.
+# Otherwise if the current working directory has a asdf-openssl2deps directory, use that.
+# Otherwise, use the asdf-openssl2 directory within ASDF_INSTALL_PATH.
+# see https://github.com/asdf-openssl2-lang/asdf-openssl2#asdf-openssl2s-folder-structure-and-packages
+if [ "${ASDF_OPENSSL2_DIR-}" = "" ] &&
+	[ ! -d "${PWD}/asdf-openssl2deps" ]; then
+	ASDF_OPENSSL2_DIR="${ASDF_INSTALL_PATH}/asdf-openssl2"
+fi

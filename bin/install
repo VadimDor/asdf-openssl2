@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -ueo pipefail
+shopt -s dotglob
+
+# shellcheck source=SCRIPTDIR/../lib/utils.bash
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/utils.bash"
+
+asdf_openssl2_init "install"
+asdf_openssl2_init_traps
+
+# Install Openssl2, building from source if necessary.
+# The installation will be placed in ASDF_INSTALL_PATH when complete.
+asdf_openssl2_install() {
+	if [ "$ASDF_OPENSSL2_DEBUG" = "yes" ]; then
+		set -x
+	fi
+
+	if [ "$(asdf_openssl2_needs_download)" = "yes" ]; then
+		die "No asdf-openssl2 source to build or archive to install."
+		return 1
+	fi
+
+	asdf_openssl2_build
+	section_start "III. Install (${ASDF_OPENSSL2_INSTALL_PATH//${HOME}/\~})"
+
+	step_start "cp to ${ASDF_OPENSSL2_INSTALL_PATH//${HOME}/\~}"
+	rm -rf "$ASDF_OPENSSL2_INSTALL_PATH"
+	cp -R "$ASDF_DOWNLOAD_PATH" "$ASDF_OPENSSL2_INSTALL_PATH"
+	step_end "✓"
+
+	# Finalize installation
+	step_start "mv to ${ASDF_INSTALL_PATH//${HOME}/\~}"
+	rm -rf "$ASDF_INSTALL_PATH"
+	mv -v "$ASDF_OPENSSL2_INSTALL_PATH" "$ASDF_INSTALL_PATH"
+	step_end "✓"
+
+	step_start "👑 installed Openssl2 ${ASDF_INSTALL_VERSION}$(asdf_openssl2_time)"
+	step_end "✓"
+
+	if [ "$ASDF_OPENSSL2_DEBUG" = "yes" ]; then
+		set +x
+	fi
+}
+
+# No exec {fd} redirection with bash 3
+# shellcheck disable=SC2001
+BASH_MAJOR_VERSION="$(echo "$BASH_VERSION" | sed 's/\..*//')"
+if [ "$BASH_MAJOR_VERSION" -ge 4 ]; then
+	exec {ASDF_OPENSSL2_STDOUT}<&1 {ASDF_OPENSSL2_STDERR}<&2
+	{
+		asdf_openssl2_install
+	} 1>>"$(asdf_openssl2_log)" 2>>"$(asdf_openssl2_log)"
+else
+	touch "$(asdf_openssl2_log)"
+	asdf_openssl2_install
+fi

@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software in your work, or make a fork of it, please cite it using the following metadata."
+authors:
+- family-names: "Vadim Dor (VadimDor@github.com)"
+title: "openssl2 plugin"
+version: 1.0.0
+date-released: <START DATE>
+url: "https://github.com/VadimDor/openssl2"

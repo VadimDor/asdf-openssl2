@@ -1,0 +1,10 @@
+[book]
+title = "openssl2 plugin>"
+description = "openssl2 plugin Homepage>"
+src = "."
+
+[output.html]
+git-repository-url = "https://github.com/VadimDor/openssl2/"
+edit-url-template = "https://github.com/VadimDor/openssl2/edit/main/{path}"
+additional-css = ["./docs/theme/custom.css"]
+theme = "./docs/theme"

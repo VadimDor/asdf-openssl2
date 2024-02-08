@@ -1,0 +1,7 @@
+/.vscode
+testasdf-openssl2*
+/node_modules
+/.tool-versions
+package-lock.json
+/.tmp
+/asdf-openssl2deps
