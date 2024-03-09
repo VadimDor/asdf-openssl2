@@ -21,7 +21,7 @@ jobs:
           username: ${{ github.repository_owner }}
           email: V.Dorez@mail.ru
           repo_name: ${{ github.event.repository.name }}
-          GH_TOKEN: ${{ github.token }}          
+          GH_TOKEN: ${{ secrets.METRICS_TOKEN }}          
         run: |
           git config --global user.name "$username"
           git config --global user.email "$email"
